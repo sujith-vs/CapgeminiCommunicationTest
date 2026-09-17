@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capgemini Communication Assessment Practice</title>
+    <style>
+        :root {
+            --primary: #0076ce;
+            --primary-dark: #005a9e;
+            --bg-light: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #6c757d;
+            --border: #e2e8f0;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 2px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .timer-badge {
+            background-color: #eef6fc;
+            color: var(--primary-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            border: 1px solid var(--primary);
+        }
+
+        main {
+            max-width: 1000px;
+            width: 90%;
+            margin: 2rem auto;
+            flex: 1;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        /* Home View */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .card h3 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+
+        .badge-pending { background-color: #e2e8f0; color: #475569; }
+        .badge-completed { background-color: #dcfce7; color: #15803d; }
+
+        /* Assessment & Solution Views */
+        .assessment-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-box {
+            background-color: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 4px 4px 0;
+            line-height: 1.7;
+            font-size: 1.02rem;
+        }
+
+        .options-list {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            line-height: 1.4;
+        }
+
+        .option-label:hover {
+            background-color: #f8fafc;
+        }
+
+        .option-label input {
+            margin-right: 0.75rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 220px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            resize: vertical;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,118,206,0.1);
+        }
+
+        .word-count {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        button {
+            padding: 0.65rem 1.3rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background-color: var(--primary); color: white; flex: 1; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        
+        .btn-secondary { background-color: #64748b; color: white; flex: 1; }
+        .btn-secondary:hover { background-color: #475569; }
+
+        .solution-card {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .solution-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            line-height: 1.6;
+            color: #166534;
+            white-space: pre-wrap;
+        }
+
+        .speaking-timer {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .status-text {
+            text-align: center;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Capgemini Communication Assessment Practice</div>
+        <div class="timer-badge" id="global-timer">Time Left: 30:00</div>
+    </header>
+
+    <main>
+        <div id="home-view" class="view active">
+            <h2>Select a Section to Begin or Review Solutions</h2>
+            <p style="color: var(--text-muted); margin-top: 0.25rem;">Complete practice sections sequentially or open complete solution keys at any time from here.</p>
+            
+            <div class="grid" id="sections-grid">
+                </div>
+        </div>
+
+        <div id="assessment-view" class="view">
+            <div class="assessment-container">
+                <div class="section-header">
+                    <h2 id="section-title">Section Title</h2>
+                    <div id="question-tracker">Question 1 of N</div>
+                </div>
+
+                <div id="question-body">
+                    </div>
+
+                <div class="btn-group" style="margin-top: 2rem;">
+                    <button class="btn-primary" id="next-btn" style="max-width: 200px;" onclick="nextQuestion()">Next Question</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="solutions-view" class="view">
+            <div class="assessment-container">
+                <div class="section-header">
+                    <h2 id="solution-section-title">Section Solutions</h2>
+                    <button class="btn-secondary" style="max-width: 180px;" onclick="returnToHome()">Back to Home</button>
+                </div>
+
+                <div id="solutions-body">
+                    </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- DATA STRUCTURE ---
+        const assessmentData = [
+            {
+                id: "situational",
+                title: "Situational Awareness",
+                desc: "6 Comprehensive Scenario & Workplace Email tasks",
+                questions: [
+                    {
+                        type: "writing",
+                        prompt: "Scenario: An enterprise client has sent a critical email expressing frustration regarding a 48-hour downtime in the staging environment that delayed their internal testing schedule. Your Project Lead is out of office without access to email. Write a formal response acknowledging the severity, assuring investigation, and proposing a revised timeline without overpromising.",
+                        solution: "Dear [Client Name],\n\nThank you for reaching out. We fully understand the frustration caused by the recent staging environment downtime and recognize how critical this phase is for your testing schedule.\n\nWhile our Project Lead is currently out of office, our technical infrastructure team has been mobilized to investigate the root cause of the interruption. We are actively working to restore complete stability and prevent future occurrences.\n\nI will monitor this issue personally and provide a detailed incident report along with an updated testing timeline by 3:00 PM today. We sincerely appreciate your patience as we work to resolve this.\n\nBest regards,\n[Your Name]"
+                    },
+                    {
+                        type: "writing",
+                        prompt: "Scenario: During a major code release, you discover that a peer team member made unverified database schema changes that broken dependent API endpoints. The client review is scheduled in 2 hours. Draft a direct, solution-oriented message to your peer requesting an immediate rollback or fix.",
+                        solution: "Hi [Peer Name],\n\nWhile running pre-release checks for today's review, I noticed that the recent database schema updates broke three critical API endpoints. Since our client review meeting is in two hours, we need to address this immediately.\n\nCould you please help check if we can revert to the previous migration script or deploy a quick hotfix for those schema dependencies right away? Let me know if you need assistance testing the endpoints after the patch.\n\nThanks,\n[Your Name]"
+                    },
+                    {
+                        type: "writing",
+                        prompt: "Scenario: A cross-functional design team has repeatedly delayed sending wireframe assets, preventing your development team from meeting sprint goals. Draft a respectful follow-up email to the design lead highlighting the block and requesting a firm delivery time.",
+                        solution: "Hi [Design Lead Name],\n\nHope you are having a productive week.\n\nI am following up on the wireframe assets for Module B. Our development team is currently blocked on implementing the UI components, which places our upcoming sprint deadline at risk.\n\nCould you please provide an estimated delivery window for these assets today? If there are any bottlenecks or missing inputs holding up the designs, please let us know so we can assist.\n\nBest regards,\n[Your Name]"
+                    },
+                    {
+                        type: "writing",
+                        prompt: "Scenario: A customer sent a feedback ticket complaining that an automated feature update removed a key export option they rely on daily. Write a professional customer support response acknowledging their concern and outlining the workaround/roadmap.",
+                        solution: "Dear [Customer Name],\n\nThank you for sharing your feedback regarding the recent export option update. We understand that removing this specific layout disrupted your daily workflow, and we apologize for the inconvenience caused.\n\nWhile our team redesigned the interface to improve overall export speed, we recognize how essential that format was for your operations. In the interim, you can generate the required layout using the 'Custom CSV Builder' option under Advanced Settings.\n\nAdditionally, I have logged your feedback with our product development team for evaluation in our upcoming release cycle.\n\nWarm regards,\n[Your Name]"
+                    },
+                    {
+                        type: "writing",
+                        prompt: "Scenario: You are assigned to two high-priority projects with overlapping sprint deadlines next Friday. Draft a clear email to your manager explaining the resource constraint and requesting prioritization guidance.",
+                        solution: "Dear [Manager Name],\n\nI am writing to request guidance regarding my current workload allocation for next week. Both Project A and Project B have major deliverable deadlines scheduled for Friday.\n\nBased on estimated development hours, completing both tasks concurrently with thorough QA testing will not be feasible without compromising quality. Below is a breakdown of estimated hours:\n- Project A (Feature Integration): ~25 hours\n- Project B (Security Patching): ~20 hours\n\nCould you please advise which project should take precedence for Friday's deployment? I can then shift the secondary deliverable to the following sprint.\n\nBest regards,\n[Your Name]"
+                    },
+                    {
+                        type: "writing",
+                        prompt: "Scenario: You need to decline an invitation to join an optional steering committee due to your current workload commitments, while maintaining strong working relationships.",
+                        solution: "Dear [Committee Lead Name],\n\nThank you for inviting me to join the Steering Committee. I truly appreciate the opportunity to contribute to this initiative.\n\nHowever, due to my current commitments as primary developer on Project X's upcoming delivery, I am unable to dedicate the necessary time to committee activities right now. I want to ensure I do not overcommit and compromise my existing project deliverables.\n\nI would love to stay informed on the committee's progress and re-evaluate my participation in the next quarter.\n\nBest regards,\n[Your Name]"
+                    }
+                ]
+            },
+            {
+                id: "reading",
+                title: "Reading Paragraph",
+                desc: "4 Expanded passage comprehension items",
+                questions: [
+                    {
+                        type: "mcq",
+                        passage: "Passage 1: Enterprise transition to cloud-native architecture offers unprecedented elasticity, enabling organizations to scale compute resources dynamically according to demand spikes. However, this flexibility introduces security challenges. Recent industry audits indicate that over 80% of data exposure incidents in cloud infrastructure stem not from sophisticated external breaches, but from internal configuration oversights and overly permissive Access Management (IAM) roles. Consequently, modern cybersecurity frameworks emphasize zero-trust architecture, automated continuous monitoring, and strict least-privilege access enforcement over traditional perimeter defense.",
+                        prompt: "Based on the passage, what is highlighted as the primary vulnerability leading to cloud data exposure?",
+                        options: [
+                            "Sophisticated external zero-day exploits",
+                            "Internal misconfigurations and overly broad access permissions",
+                            "Hardware failures in cloud data centers",
+                            "Inadequate network bandwidth during scale events"
+                        ],
+                        answer: 1,
+                        solution: "Correct Option: B (Internal misconfigurations and overly broad access permissions).\nReason: The passage explicitly highlights that 80% of data exposure stems from internal configuration oversights and permissive IAM roles."
+                    },
+                    {
+                        type: "mcq",
+                        passage: "Passage 2: As distributed global teams become standard in technology organizations, reliance on asynchronous communication models has accelerated. Asynchronous workflows reduce real-time meeting fatigue and accommodate team members across different time zones. However, the success of asynchronous collaboration hinges on rigorous documentation standards and clear context sharing. Without comprehensive written documentation, decision-making cycles slow down, and team alignment degrades into fragmented miscommunications.",
+                        prompt: "What critical requirement determines the success of asynchronous collaboration according to the text?",
+                        options: [
+                            "Increasing the frequency of daily status meetings",
+                            "Enforcing uniform working hours across all time zones",
+                            "Comprehensive documentation standards and clear context",
+                            "Replacing written communication with video recordings"
+                        ],
+                        answer: 2,
+                        solution: "Correct Option: C (Comprehensive documentation standards and clear context).\nReason: The passage explicitly notes that success hinges on rigorous documentation standards."
+                    },
+                    {
+                        type: "mcq",
+                        passage: "Passage 3: Agile project delivery relies heavily on short, iterative cycles known as sprints, typically spanning one to four weeks. Unlike legacy waterfall methodologies that lock requirement specifications early in the lifecycle, Agile promotes continuous adaptation based on regular stakeholder feedback. While this approach enhances product responsiveness to market demands, it requires strict scope discipline during sprint planning to prevent 'scope creep'—the gradual, unmanaged addition of features that risks team burnout and missed delivery targets.",
+                        prompt: "Why is strict scope discipline required during sprint planning in Agile environments?",
+                        options: [
+                            "To eliminate client feedback completely",
+                            "To prevent scope creep and protect delivery targets",
+                            "To lengthen project development timelines",
+                            "To avoid changing software requirements during execution"
+                        ],
+                        answer: 1,
+                        solution: "Correct Option: B (To prevent scope creep and protect delivery targets).\nReason: The text specifically explains that scope discipline prevents scope creep, burnout, and missed delivery targets."
+                    },
+                    {
+                        type: "mcq",
+                        passage: "Passage 4: Artificial Intelligence systems are increasingly integrated into Tier-1 customer support operations to automate routine ticketing, process initial queries, and reduce baseline resolution times. While AI models handle predictable structured tasks efficiently, human agents remain irreplaceable when navigating complex, nuanced, or emotionally charged customer escalations. Organizations achieving high satisfaction scores implement a hybrid model where AI handles triage while human agents address empathetic resolution.",
+                        prompt: "What role is designated specifically for human agents in the hybrid customer support model?",
+                        options: [
+                            "Handling routine automated ticket triage",
+                            "Navigating complex, nuanced, or emotional escalations",
+                            "Managing server infrastructure maintenance",
+                            "Replacing AI entirely across all support channels"
+                        ],
+                        answer: 1,
+                        solution: "Correct Option: B (Navigating complex, nuanced, or emotional escalations).\nReason: The text notes human intervention is irreplaceable for these specific types of support tasks."
+                    }
+                ]
+            },
+            {
+                id: "listening",
+                title: "Listening Comprehension",
+                desc: "4 Spoken audio comprehension items",
+                questions: [
+                    {
+                        type: "listening",
+                        textToRead: "Attention team members. The mandatory security compliance audit has been moved up to Thursday at 3:00 PM. Please ensure all code repositories are scanned and access logs updated by Wednesday evening.",
+                        prompt: "By when must team members complete scanning their code repositories and updating access logs?",
+                        options: ["Thursday at 3:00 PM", "Wednesday evening", "Friday morning", "End of the month"],
+                        answer: 1,
+                        solution: "Correct Option: B (Wednesday evening).\nReason: The voice prompt stated all repository scans must be completed by Wednesday evening prior to the Thursday audit."
+                    },
+                    {
+                        type: "listening",
+                        textToRead: "Due to emergency maintenance on server cluster B, the staging environment will be offline from 10:00 PM tonight until 2:00 AM tomorrow. Automated testing pipelines will resume execution at 2:30 AM.",
+                        prompt: "When are automated testing pipelines scheduled to resume execution?",
+                        options: ["10:00 PM tonight", "2:00 AM tomorrow", "2:30 AM tomorrow", "8:00 AM tomorrow"],
+                        answer: 2,
+                        solution: "Correct Option: C (2:30 AM tomorrow).\nReason: The text indicates testing pipelines resume execution at 2:30 AM after maintenance."
+                    },
+                    {
+                        type: "listening",
+                        textToRead: "To request reimbursement for client lunch expenses, submit your digitized receipts through the finance portal under category Code 402 within five business days of the event.",
+                        prompt: "Which category code should be selected for client lunch reimbursement?",
+                        options: ["Code 402", "Code 204", "Code 500", "Code 100"],
+                        answer: 0,
+                        solution: "Correct Option: A (Code 402)."
+                    },
+                    {
+                        type: "listening",
+                        textToRead: "The annual developer conference registration closes on Friday. Employees presenting technical workshops are eligible for full fee waivers upon manager approval.",
+                        prompt: "Which employees qualify for a full fee waiver for the conference?",
+                        options: [
+                            "All newly hired employees",
+                            "Employees presenting technical workshops with manager approval",
+                            "Only senior engineering leads",
+                            "Employees who register after Friday"
+                        ],
+                        answer: 1,
+                        solution: "Correct Option: B (Employees presenting technical workshops with manager approval)."
+                    }
+                ]
+            },
+            {
+                id: "spoken",
+                title: "Spoken Topics",
+                desc: "2 Comprehensive Speaking Topics (60s Prep + 90s Speech Display)",
+                questions: [
+                    {
+                        type: "spoken",
+                        prompt: "Topic 1: Discuss the impact of Generative Artificial Intelligence on software development practices. Structure your response to cover potential productivity gains, quality assurance considerations, and ethical implications regarding proprietary data.",
+                        solution: "Reference Speech Structure:\n- Introduction: AI as an assistant to human developers.\n- Productivity: Automated boilerplate generation, accelerated debugging.\n- QA Considerations: Necessity of manual code review and security validation.\n- Ethics/Privacy: Risks of exposing proprietary code to public LLM models.\n- Conclusion: Shifting software developer roles toward architecture and oversight."
+                    },
+                    {
+                        type: "spoken",
+                        prompt: "Topic 2: Explain why effective cross-functional communication is crucial during major enterprise system migrations. Detail potential risks of communication silos and strategies to maintain alignment across technical and non-technical stakeholders.",
+                        solution: "Reference Speech Structure:\n- Business Context: Aligning technical goals with operational continuity.\n- Silo Risks: Unexpected downtime, broken business logic, stakeholder friction.\n- Alignment Strategies: Transparent progress reporting, plain-language updates, unified schedules.\n- Conclusion: Cross-functional reviews ensure smooth transition."
+                    }
+                ]
+            },
+            {
+                id: "writing",
+                title: "Business Writing",
+                desc: "2 Enterprise Written Communication Tasks",
+                questions: [
+                    {
+                        type: "writing",
+                        prompt: "Prompt 1: Write a detailed business proposal email to your Department Head requesting budget approval ($2,500) for integrating an AI-powered code security scanner into your CI/CD pipeline. Address expected ROI, security benefits, and implementation timeline.",
+                        solution: "Dear [Department Head Name],\n\nI am writing to propose the integration of [Tool Name], an automated AI security scanner, into our deployment pipeline. The annual team license cost is $2,500.\n\nKey Benefits & ROI:\n1. Early Vulnerability Detection: Reduces post-release security patching costs by detecting flaws during pull requests.\n2. Time Efficiency: Saves ~15 engineering hours per sprint currently spent on manual security reviews.\n3. Compliance: Automatically generates audit reports aligned with enterprise compliance standards.\n\nImplementation Plan:\nSetup and integration will take approximately 3 days without disrupting active sprint schedules.\n\nI have attached the technical specifications and detailed cost analysis for your review. I look forward to discussing this in our next 1-on-1.\n\nBest regards,\n[Your Name]"
+                    },
+                    {
+                        type: "writing",
+                        prompt: "Prompt 2: Draft a formal executive summary email to a client explaining a 1-week postponement of a major software release due to unexpected third-party API deprecations, while reassuring them of project stability.",
+                        solution: "Dear [Client Executive Name],\n\nI am writing to inform you of a revised release schedule for [Project Name] Version 2.0. Following final integration testing, our team identified unexpected deprecation changes in a required third-party payment gateway API.\n\nTo ensure complete payment processing security and platform reliability, we have rescheduled the deployment from October 10th to October 17th. This 1-week adjustment allows our team to implement and validate the updated API integration thoroughly.\n\nAll remaining project deliverables and feature scopes remain completely intact. We will provide daily progress briefings until final rollout.\n\nThank you for your understanding as we maintain our commitment to delivery excellence.\n\nBest regards,\n[Your Name]"
+                    }
+                ]
+            },
+            {
+                id: "grammar",
+                title: "Grammar & Sentence Correction",
+                desc: "10 Standard Multiple Choice Items",
+                questions: [
+                    { type: "mcq", prompt: "Identify the grammatically correct sentence:", options: ["Neither of the options are ideal.", "Neither of the options is ideal.", "Neither of options were ideal.", "Neither of option is ideal."], answer: 1, solution: "Correct Option: B ('Neither of the options is ideal.').\nReason: 'Neither' takes a singular verb." },
+                    { type: "mcq", prompt: "Select the sentence with correct verb tense:", options: ["He perform well yesterday during presentation.", "He performed well yesterday during the presentation.", "He performs well yesterday during presentation.", "He has perform well yesterday during presentation."], answer: 1, solution: "Correct Option: B ('He performed well yesterday...').\nReason: Past tense required for completed past action." },
+                    { type: "mcq", prompt: "Identify the correct subject-verb agreement:", options: ["The committee have reached its decision.", "The committee has reached its decision.", "The committee have reach its decision.", "The committee has reach its decision."], answer: 1, solution: "Correct Option: B ('The committee has reached its decision.').\nReason: Collective noun as a single unit takes singular verb." },
+                    { type: "mcq", prompt: "Select the correct preposition: She is senior ___ me in the organization.", options: ["than", "to", "from", "with"], answer: 1, solution: "Correct Option: B ('to').\nReason: Adjectives like senior, junior, superior take 'to'." },
+                    { type: "mcq", prompt: "Choose the correct hypothetical sentence:", options: ["If I was you, I would accept the offer.", "If I were you, I would accept the offer.", "If I am you, I will accept the offer.", "If I be you, I would accept the offer."], answer: 1, solution: "Correct Option: B ('If I were you...').\nReason: Subjunctive mood for hypothetical condition." },
+                    { type: "mcq", prompt: "Select the correct possessive form:", options: ["Its a comprehensive project report.", "It's a comprehensive project report.", "Its' a comprehensive project report.", "It's a comprehensive project report's."], answer: 1, solution: "Correct Option: B ('It's').\nReason: Contraction of 'It is'." },
+                    { type: "mcq", prompt: "Select the correct preposition: The team accommodated ___ the new requirements.", options: ["to", "with", "by", "for"], answer: 0, solution: "Correct Option: A ('to')." },
+                    { type: "mcq", prompt: "Choose the correct phrasing:", options: ["Despite of the delay, we finished on time.", "Despite the delay, we finished on time.", "In spite the delay, we finished on time.", "Despite for delay, we finished on time."], answer: 1, solution: "Correct Option: B ('Despite the delay...').\nReason: 'Despite' is not followed by 'of'." },
+                    { type: "mcq", prompt: "Choose the correct sentence:", options: ["The telemetry data suggests a clear trend.", "The telemetry data suggest a clear trend.", "The telemetry data suggesting clear trend.", "The telemetry data are suggest clear trend."], answer: 0, solution: "Correct Option: A ('The telemetry data suggests a clear trend.')." },
+                    { type: "mcq", prompt: "Select the correct agreement: Every candidate must bring ___ identification.", options: ["their", "his or her", "there", "its"], answer: 1, solution: "Correct Option: B ('his or her').\nReason: Formal singular pronoun agreement." }
+                ]
+            }
+        ];
+
+        // --- GLOBAL APP STATE ---
+        let completedSections = new Set();
+        let currentSectionIdx = null;
+        let currentQuestionIdx = 0;
+        let globalTimerSeconds = 1800; // 30 mins
+        let speechTimer = null;
+        let timerPaused = false;
+
+        // --- TIMER LOGIC ---
+        function startGlobalTimer() {
+            const timerDisplay = document.getElementById('global-timer');
+            setInterval(() => {
+                if (timerPaused) return;
+
+                if (globalTimerSeconds <= 0) {
+                    timerDisplay.textContent = "Time Elapsed: 00:00";
+                    alert("30 Minutes overall time limit expired!");
+                    returnToHome();
+                    return;
+                }
+                globalTimerSeconds--;
+                const mins = Math.floor(globalTimerSeconds / 60);
+                const secs = globalTimerSeconds % 60;
+                timerDisplay.textContent = `Time Left: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // --- RENDER HOMEPAGE ---
+        function renderHome() {
+            timerPaused = false; // Resume timer when returning home
+            const grid = document.getElementById('sections-grid');
+            grid.innerHTML = '';
+
+            assessmentData.forEach((sec, idx) => {
+                const isDone = completedSections.has(sec.id);
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div>
+                        <span class="badge ${isDone ? 'badge-completed' : 'badge-pending'}">
+                            ${isDone ? 'Completed' : 'Pending'}
+                        </span>
+                        <h3>${sec.title}</h3>
+                        <p>${sec.desc}</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-primary" onclick="startSection(${idx})">
+                            ${isDone ? 'Retake Section' : 'Start Section'}
+                        </button>
+                        <button class="btn-secondary" onclick="viewSectionSolutions(${idx})">
+                            View Solutions
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- SECTION FLOW CONTROLLER ---
+        function startSection(idx) {
+            currentSectionIdx = idx;
+            currentQuestionIdx = 0;
+            
+            document.getElementById('home-view').classList.remove('active');
+            document.getElementById('solutions-view').classList.remove('active');
+            document.getElementById('assessment-view').classList.add('active');
+            
+            document.getElementById('section-title').textContent = assessmentData[idx].title;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const section = assessmentData[currentSectionIdx];
+            const q = section.questions[currentQuestionIdx];
+            const tracker = document.getElementById('question-tracker');
+            const body = document.getElementById('question-body');
+
+            tracker.textContent = `Question ${currentQuestionIdx + 1} of ${section.questions.length}`;
+            body.innerHTML = '';
+
+            if (speechTimer) clearInterval(speechTimer);
+
+            // Render type-specific layout
+            if (q.type === 'writing') {
+                body.innerHTML = `
+                    <div class="prompt-box">${q.prompt}</div>
+                    <textarea id="writing-input" placeholder="Type your professional response here..." oninput="updateWordCount(this)"></textarea>
+                    <div class="word-count">Words: <span id="word-cnt">0</span></div>
+                `;
+            } else if (q.type === 'mcq') {
+                let html = '';
+                if(q.passage) html += `<div class="prompt-box">${q.passage}</div>`;
+                html += `<p style="font-weight:600; margin-bottom: 1rem; font-size: 1.05rem;">${q.prompt}</p><div class="options-list">`;
+                
+                q.options.forEach((opt, oIdx) => {
+                    html += `
+                        <div class="option-item">
+                            <label class="option-label">
+                                <input type="radio" name="option" value="${oIdx}">
+                                ${opt}
+                            </label>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                body.innerHTML = html;
+            } else if (q.type === 'listening') {
+                body.innerHTML = `
+                    <div class="prompt-box" style="display:flex; align-items:center; gap: 1rem;">
+                        <button class="btn-secondary" style="max-width:220px;" onclick="playAudio('${q.textToRead.replace(/'/g, "\\'")}')">🔊 Play Audio Prompt</button>
+                        <span>Click to listen to spoken context</span>
+                    </div>
+                    <p style="font-weight:600; margin-bottom: 1rem; font-size: 1.05rem;">${q.prompt}</p>
+                    <div class="options-list">
+                        ${q.options.map((opt, oIdx) => `
+                            <div class="option-item">
+                                <label class="option-label">
+                                    <input type="radio" name="option" value="${oIdx}">
+                                    ${opt}
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (q.type === 'spoken') {
+                body.innerHTML = `
+                    <div class="prompt-box">${q.prompt}</div>
+                    <div class="status-text" id="speak-status">Preparation Time</div>
+                    <div class="speaking-timer" id="speak-timer">60</div>
+                `;
+                runSpokenTimers();
+            }
+
+            // Adjust Next Button text for last question
+            const nextBtn = document.getElementById('next-btn');
+            if (currentQuestionIdx === section.questions.length - 1) {
+                nextBtn.textContent = "Finish Section";
+            } else {
+                nextBtn.textContent = "Next Question";
+            }
+        }
+
+        function updateWordCount(ta) {
+            const words = ta.value.trim().split(/\s+/).filter(w => w.length > 0);
+            document.getElementById('word-cnt').textContent = words.length;
+        }
+
+        function playAudio(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Browser Text-to-Speech is not supported in this environment.");
+            }
+        }
+
+        function runSpokenTimers() {
+            let prepLeft = 60;
+            let speakLeft = 90;
+            const timerEl = document.getElementById('speak-timer');
+            const statusEl = document.getElementById('speak-status');
+
+            speechTimer = setInterval(() => {
+                if (prepLeft > 0) {
+                    prepLeft--;
+                    timerEl.textContent = prepLeft;
+                } else if (speakLeft > 0) {
+                    if (speakLeft === 90) {
+                        statusEl.textContent = "Microphone Active - Speak Now";
+                        statusEl.style.color = "var(--danger)";
+                    }
+                    speakLeft--;
+                    timerEl.textContent = speakLeft;
+                } else {
+                    clearInterval(speechTimer);
+                    statusEl.textContent = "Speaking Time Complete";
+                    statusEl.style.color = "var(--success)";
+                }
+            }, 1000);
+        }
+
+        function nextQuestion() {
+            const section = assessmentData[currentSectionIdx];
+            if (currentQuestionIdx < section.questions.length - 1) {
+                currentQuestionIdx++;
+                renderQuestion();
+            } else {
+                // Submit Section
+                completedSections.add(section.id);
+                returnToHome();
+            }
+        }
+
+        // --- VIEW SOLUTIONS PAGE (ACCESSIBLE FROM HOME) ---
+        function viewSectionSolutions(idx) {
+            timerPaused = true; // Pause assessment timer while reviewing solutions
+            const section = assessmentData[idx];
+            
+            document.getElementById('home-view').classList.remove('active');
+            document.getElementById('assessment-view').classList.remove('active');
+            document.getElementById('solutions-view').classList.add('active');
+
+            document.getElementById('solution-section-title').textContent = `${section.title} - Solution Key`;
+            
+            const container = document.getElementById('solutions-body');
+            container.innerHTML = '';
+
+            section.questions.forEach((q, qIdx) => {
+                const card = document.createElement('div');
+                card.className = 'solution-card';
+
+                let questionContent = `<p style="font-weight:700; color:var(--primary-dark); margin-bottom:0.5rem;">Q${qIdx + 1}.</p>`;
+                
+                if (q.passage) {
+                    questionContent += `<div class="prompt-box" style="font-size:0.95rem; margin-bottom:0.75rem;">${q.passage}</div>`;
+                }
+                if (q.textToRead) {
+                    questionContent += `<p style="font-style:italic; color:var(--text-muted); margin-bottom:0.5rem;">[Audio Context]: "${q.textToRead}"</p>`;
+                }
+                
+                questionContent += `<p style="font-weight:600; margin-bottom: 0.75rem;">${q.prompt}</p>`;
+
+                if (q.options) {
+                    questionContent += `<ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">`;
+                    q.options.forEach((opt, oIdx) => {
+                        questionContent += `<li>${String.fromCharCode(65 + oIdx)}. ${opt}</li>`;
+                    });
+                    questionContent += `</ul>`;
+                }
+
+                questionContent += `
+                    <div class="solution-box">
+                        <strong>Reference Solution / Explanation:</strong>\n${q.solution}
+                    </div>
+                `;
+
+                card.innerHTML = questionContent;
+                container.appendChild(card);
+            });
+        }
+
+        function returnToHome() {
+            if (speechTimer) clearInterval(speechTimer);
+            document.getElementById('assessment-view').classList.remove('active');
+            document.getElementById('solutions-view').classList.remove('active');
+            document.getElementById('home-view').classList.add('active');
+            renderHome();
+        }
+
+        // Initialize App
+        window.onload = () => {
+            startGlobalTimer();
+            renderHome();
+        };
+    </script>
+</body>
+</html>
