@@ -47,31 +47,47 @@ SYS;
 
 $userMsg = "PROMPT GIVEN TO CANDIDATE:\n{$prompt}\n\nREFERENCE MODEL ANSWER:\n{$modelAnswer}\n\nCANDIDATE'S ANSWER:\n{$userAnswer}";
 
-$payload = json_encode([
-    'model' => $model,
-    'messages' => [
-        ['role' => 'system', 'content' => $system],
-        ['role' => 'user', 'content' => $userMsg],
-    ],
-    'temperature' => 0.3,
-    'response_format' => ['type' => 'json_object'],
-]);
+function buildPayload($model, $system, $userMsg) {
+    return json_encode([
+        'model' => $model,
+        'messages' => [
+            ['role' => 'system', 'content' => $system],
+            ['role' => 'user', 'content' => $userMsg],
+        ],
+        'temperature' => 0.3,
+    ]);
+}
 
-$ch = curl_init($baseUrl . '/chat/completions');
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST => true,
-    CURLOPT_HTTPHEADER => [
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $apiKey,
-    ],
-    CURLOPT_POSTFIELDS => $payload,
-    CURLOPT_TIMEOUT => 60,
-]);
-$response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curlErr  = curl_error($ch);
-curl_close($ch);
+$payload = buildPayload($model, $system, $userMsg);
+
+$response = false;
+$httpCode = 0;
+$curlErr  = '';
+$attempts = 3; // retry transient upstream failures (502/503/429/timeouts)
+for ($i = 1; $i <= $attempts; $i++) {
+    $ch = curl_init($baseUrl . '/chat/completions');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $apiKey,
+        ],
+        CURLOPT_POSTFIELDS => $payload,
+        CURLOPT_TIMEOUT => 45,
+    ]);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr  = curl_error($ch);
+    curl_close($ch);
+
+    $transient = ($response === false) || in_array($httpCode, [429, 500, 502, 503, 504], true);
+    if (!$transient) break;
+    if ($i < $attempts) {
+        sleep($i * 2);
+        $payload = buildPayload($model, $system, $userMsg); // rebuild in case of encoding issues
+    }
+}
 
 if ($response === false) {
     http_response_code(502);
@@ -93,6 +109,12 @@ if (!$content) {
 }
 
 $eval = json_decode($content, true);
+if (!is_array($eval)) {
+    // Some models wrap JSON in prose or code fences — try to recover.
+    if (preg_match('/\{[\s\S]*\}/', $content, $mm)) {
+        $eval = json_decode($mm[0], true);
+    }
+}
 if (!is_array($eval)) {
     http_response_code(502);
     echo json_encode(['error' => 'LLM returned non-JSON evaluation']);

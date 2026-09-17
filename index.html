@@ -735,7 +735,7 @@
                     <div style="display:flex; justify-content:center; margin-bottom:1rem;">
                         <button class="btn-primary" id="mic-btn" style="max-width:260px;" onclick="toggleMic()" disabled>🎤 Microphone unlocks after prep time</button>
                     </div>
-                    <textarea id="transcript-input" placeholder="Your spoken response will appear here once speech recognition completes. You can also type or edit your answer here." oninput="saveAnswer(this.value)" style="height:160px;"></textarea>
+                    <textarea id="transcript-input" readonly placeholder="Your spoken response will appear here after speech recognition completes." style="height:160px; background-color:var(--bg-light);"></textarea>
                     <div class="word-count">Words: <span id="word-cnt">0</span></div>
                 `;
                 runSpokenTimers();
@@ -828,7 +828,7 @@
                 const ta = document.getElementById('transcript-input');
                 if (ta) {
                     ta.value = (finalTranscript + interim).trim();
-                    ta.dispatchEvent(new Event('input'));
+                    saveAnswer(ta.value);
                 }
             };
             recognition.onend = () => {
@@ -844,9 +844,9 @@
                 const micBtn = document.getElementById('mic-btn');
                 if (micBtn) { micBtn.textContent = '🎤 Start Recording'; micBtn.style.backgroundColor = 'var(--primary)'; }
                 if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-                    alert('Microphone permission denied. Please type your answer in the text box instead.');
+                    alert('Microphone permission denied. Please allow microphone access and try again — this question requires spoken input.');
                 } else if (event.error === 'no-speech') {
-                    alert('No speech was detected. Please try again or type your answer.');
+                    alert('No speech was detected. Please try recording again.');
                 }
             };
 
@@ -877,7 +877,7 @@
                 micBtn.style.display = 'none';
                 const note = document.createElement('p');
                 note.style.cssText = 'text-align:center; color:var(--text-muted); margin-bottom:1rem;';
-                note.textContent = 'Speech recognition is not supported in this browser — please type your answer below.';
+                note.textContent = 'Speech recognition is not supported in this browser — this question cannot be answered here.';
                 micBtn.parentElement.appendChild(note);
             }
 
@@ -889,11 +889,12 @@
                         micBtn.disabled = false;
                         micBtn.textContent = '🎤 Start Recording';
                     } else if (prepLeft === 0) {
-                        micBtn.textContent = 'Speak now (type below if mic unavailable)';
+                        micBtn.textContent = 'Speech recognition unavailable — typed answers not allowed';
+                        micBtn.disabled = true;
                     }
                 } else if (speakLeft > 0) {
                     if (speakLeft === 90) {
-                        statusEl.textContent = SR ? 'Microphone Active — Speak Now (you may keep typing too)' : 'Speaking Time — type your answer below';
+                        statusEl.textContent = SR ? 'Microphone Active — Speak Now' : 'Speech recognition is not supported in this browser — this question cannot be answered here';
                         statusEl.style.color = 'var(--danger)';
                     }
                     speakLeft--;
@@ -902,7 +903,7 @@
                         clearInterval(speechTimer);
                         speechTimer = null;
                         stopMicIfActive();
-                        statusEl.textContent = 'Speaking Time Complete — you can still edit your answer below';
+                        statusEl.textContent = 'Speaking Time Complete';
                         statusEl.style.color = 'var(--success)';
                     }
                 }
@@ -1033,9 +1034,11 @@
                     });
                     questionContent += `</ul>`;
                     if (res) {
-                        questionContent += `<div class="solution-box" style="${res.isCorrect ? '' : 'background-color:#fef2f2; border-color:#fecaca; color:#b91c1c;'}">
-                            <strong>${res.isCorrect ? '✓ Correct' : '✗ Incorrect'}:</strong> ${q.solution}
-                        </div>`;
+                        const verdict = res.isCorrect
+                            ? `<div class="solution-box" style="margin-bottom:0.75rem;"><strong>✓ Your answer is correct.</strong></div>`
+                            : `<div class="solution-box" style="margin-bottom:0.75rem; background-color:#fef2f2; border-color:#fecaca; color:#b91c1c;"><strong>✗ Your answer is incorrect.</strong></div>`;
+                        questionContent += verdict;
+                        questionContent += `<div class="solution-box"><strong>Explanation:</strong><br>${q.solution}</div>`;
                     }
                 } else {
                     // Unstructured (writing / spoken) — user answer vs model answer + AI evaluation slot
