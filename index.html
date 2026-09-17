@@ -232,6 +232,26 @@
         .btn-secondary { background-color: #64748b; color: white; flex: 1; }
         .btn-secondary:hover { background-color: #475569; }
 
+        .btn-back {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            flex: 0 0 auto;
+            max-width: 180px;
+        }
+        .btn-back:hover { background-color: #eef6fc; }
+
+        .timer-expired {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
         .solution-card {
             background: var(--bg-light);
             border: 1px solid var(--border);
@@ -270,8 +290,11 @@
 <body>
 
     <header>
-        <div class="logo">Capgemini Communication Assessment Practice</div>
-        <div class="timer-badge" id="global-timer">Time Left: 30:00</div>
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <button class="btn-back" id="back-home-btn" style="display:none; padding:0.4rem 0.9rem;" onclick="handleBackToHome()">← Back to Home</button>
+            <div class="logo">Capgemini Communication Assessment Practice</div>
+        </div>
+        <div class="timer-badge" id="global-timer" style="display:none;">Time Left: 30:00</div>
     </header>
 
     <main>
@@ -294,6 +317,7 @@
                     </div>
 
                 <div class="btn-group" style="margin-top: 2rem;">
+                    <button class="btn-secondary" id="back-btn" style="max-width: 200px; display:none;" onclick="prevQuestion()">Previous</button>
                     <button class="btn-primary" id="next-btn" style="max-width: 200px;" onclick="nextQuestion()">Next Question</button>
                 </div>
             </div>
@@ -492,7 +516,7 @@
             {
                 id: "grammar",
                 title: "Grammar & Sentence Correction",
-                desc: "10 Standard Multiple Choice Items",
+                desc: "30 Standard Multiple Choice Items",
                 questions: [
                     { type: "mcq", prompt: "Identify the grammatically correct sentence:", options: ["Neither of the options are ideal.", "Neither of the options is ideal.", "Neither of options were ideal.", "Neither of option is ideal."], answer: 1, solution: "Correct Option: B ('Neither of the options is ideal.').\nReason: 'Neither' takes a singular verb." },
                     { type: "mcq", prompt: "Select the sentence with correct verb tense:", options: ["He perform well yesterday during presentation.", "He performed well yesterday during the presentation.", "He performs well yesterday during presentation.", "He has perform well yesterday during presentation."], answer: 1, solution: "Correct Option: B ('He performed well yesterday...').\nReason: Past tense required for completed past action." },
@@ -503,41 +527,90 @@
                     { type: "mcq", prompt: "Select the correct preposition: The team accommodated ___ the new requirements.", options: ["to", "with", "by", "for"], answer: 0, solution: "Correct Option: A ('to')." },
                     { type: "mcq", prompt: "Choose the correct phrasing:", options: ["Despite of the delay, we finished on time.", "Despite the delay, we finished on time.", "In spite the delay, we finished on time.", "Despite for delay, we finished on time."], answer: 1, solution: "Correct Option: B ('Despite the delay...').\nReason: 'Despite' is not followed by 'of'." },
                     { type: "mcq", prompt: "Choose the correct sentence:", options: ["The telemetry data suggests a clear trend.", "The telemetry data suggest a clear trend.", "The telemetry data suggesting clear trend.", "The telemetry data are suggest clear trend."], answer: 0, solution: "Correct Option: A ('The telemetry data suggests a clear trend.')." },
-                    { type: "mcq", prompt: "Select the correct agreement: Every candidate must bring ___ identification.", options: ["their", "his or her", "there", "its"], answer: 1, solution: "Correct Option: B ('his or her').\nReason: Formal singular pronoun agreement." }
+                    { type: "mcq", prompt: "Select the correct agreement: Every candidate must bring ___ identification.", options: ["their", "his or her", "there", "its"], answer: 1, solution: "Correct Option: B ('his or her').\nReason: Formal singular pronoun agreement." },
+                    { type: "mcq", prompt: "Identify the sentence with the correct article usage:", options: ["She is a honest employee.", "She is an honest employee.", "She is the honest employee of my team.", "She is honest employee."], answer: 1, solution: "Correct Option: B ('an honest employee').\nReason: 'Honest' begins with a vowel sound, so 'an' is required despite the consonant letter." },
+                    { type: "mcq", prompt: "Spot the error: Choose the grammatically correct sentence.", options: ["One of my friends are moving to Germany.", "One of my friends is moving to Germany.", "One of my friend is moving to Germany.", "One of my friends were moving to Germany."], answer: 1, solution: "Correct Option: B.\nReason: 'One of + plural noun' takes a singular verb ('is')." },
+                    { type: "mcq", prompt: "Select the correct sentence:", options: ["The manager discussed about the roadmap.", "The manager discussed the roadmap.", "The manager discussed on the roadmap.", "The manager discussed over the roadmap."], answer: 1, solution: "Correct Option: B.\nReason: 'Discuss' is a transitive verb and takes a direct object without a preposition." },
+                    { type: "mcq", prompt: "Choose the correct comparative form:", options: ["This release is more better than the last one.", "This release is better than the last one.", "This release is gooder than the last one.", "This release is more good than the last one."], answer: 1, solution: "Correct Option: B.\nReason: 'Better' is already comparative; 'more better' is a double comparative." },
+                    { type: "mcq", prompt: "Identify the correctly punctuated sentence:", options: ["However the deployment failed, we met the deadline.", "However, the deployment failed, we met the deadline.", "However the deployment failed we met the deadline.", "However, the deployment failed we met, the deadline."], answer: 0, solution: "Correct Option: A.\nReason: When 'however' starts a concessive clause mid-flow, only a comma after the subordinate clause is required here." },
+                    { type: "mcq", prompt: "Select the sentence with correct tense sequence:", options: ["He said that he will finish the report.", "He said that he would finish the report.", "He says that he would finish the report yesterday.", "He said that he finishes the report tomorrow."], answer: 1, solution: "Correct Option: B.\nReason: In reported speech after a past reporting verb, 'will' shifts to 'would'." },
+                    { type: "mcq", prompt: "Choose the correct usage:", options: ["The data was analyzed and the findings was shared.", "The data were analyzed and the findings were shared.", "The data was analyzed and the findings were shared.", "The data were analyzed and the findings was shared."], answer: 2, solution: "Correct Option: C.\nReason: In formal technical writing 'data' is often treated as a singular mass noun, while 'findings' is plural and takes 'were'." },
+                    { type: "mcq", prompt: "Identify the correct sentence:", options: ["Neither the manager nor the developers was available.", "Neither the manager nor the developers were available.", "Neither the manager or the developers were available.", "Neither of the manager nor developers was available."], answer: 1, solution: "Correct Option: B.\nReason: With 'neither...nor', the verb agrees with the nearer subject ('developers' → plural 'were')." },
+                    { type: "mcq", prompt: "Select the correct superlative:", options: ["This is the most unique solution.", "This is a unique solution.", "This is the uniquer solution.", "This is the more unique solution."], answer: 1, solution: "Correct Option: B.\nReason: 'Unique' is an absolute adjective and should not be graded with 'most' or 'more'." },
+                    { type: "mcq", prompt: "Choose the grammatically correct sentence:", options: ["Each of the tickets were resolved within SLA.", "Each of the tickets was resolved within SLA.", "Each of the ticket were resolved within SLA.", "Each of the tickets have been resolve within SLA."], answer: 1, solution: "Correct Option: B.\nReason: 'Each of + plural noun' takes a singular verb ('was')." },
+                    { type: "mcq", prompt: "Spot the correct sentence:", options: ["The report which was submitted yesterday it contains errors.", "The report which was submitted yesterday contains errors.", "The report which it was submitted yesterday contains errors.", "The report which was submitted yesterday, contains it errors."], answer: 1, solution: "Correct Option: B.\nReason: The relative clause already identifies the noun; repeating the pronoun 'it' is redundant." },
+                    { type: "mcq", prompt: "Select the correct preposition: The incident report must be submitted ___ Friday.", options: ["until", "by", "since", "from"], answer: 1, solution: "Correct Option: B ('by').\nReason: 'By' marks a deadline; 'until' marks duration up to a point in an ongoing state." },
+                    { type: "mcq", prompt: "Choose the correctly formed question:", options: ["Where the meeting is happening today?", "Where is the meeting happening today?", "Where the meeting happening is today?", "Where is happening the meeting today?"], answer: 1, solution: "Correct Option: B.\nReason: In direct questions, the auxiliary/verb precedes the subject (subject–auxiliary inversion)." },
+                    { type: "mcq", prompt: "Identify the sentence free of modifier errors:", options: ["Walking to the office, the rain soaked my clothes.", "Walking to the office, I was soaked by the rain.", "Walking to the office, my clothes got soaked by rain.", "Walking to the office, rain soaked clothes of mine."], answer: 1, solution: "Correct Option: B.\nReason: The participial phrase must modify the subject performing the action ('I'); the other versions are dangling modifiers." },
+                    { type: "mcq", prompt: "Select the correct passive construction:", options: ["The vulnerability was fixed by the team yesterday.", "The vulnerability fixed by the team yesterday.", "The vulnerability was fixed from the team yesterday.", "The vulnerability is fix by the team yesterday."], answer: 0, solution: "Correct Option: A.\nReason: Passive voice uses 'be' + past participle ('was fixed'), with the agent introduced by 'by'." },
+                    { type: "mcq", prompt: "Choose the correct conditional:", options: ["Unless you don't backup the data, you risk losing it.", "Unless you back up the data, you risk losing it.", "Unless you do backup the data, you don't risk losing it.", "Unless you not back up the data, you risk losing it."], answer: 1, solution: "Correct Option: B.\nReason: 'Unless' is already negative; adding 'not' creates a double negative." },
+                    { type: "mcq", prompt: "Identify the correct sentence:", options: ["There is fewer bugs in the new build.", "There are fewer bugs in the new build.", "There are less bugs in the new build.", "There is less bugs in the new build."], answer: 1, solution: "Correct Option: B.\nReason: 'Fewer' is used with countable nouns ('bugs') and takes plural agreement." },
+                    { type: "mcq", prompt: "Select the sentence with correct word choice:", options: ["Please advice the team about the change.", "Please advise the team about the change.", "Please advise to the team about the change.", "Please advising the team about the change."], answer: 1, solution: "Correct Option: B.\nReason: 'Advise' is the verb; 'advice' is the noun." },
+                    { type: "mcq", prompt: "Choose the grammatically correct sentence:", options: ["The number of applications have increased.", "The number of applications has increased.", "A number of applications has increased recently.", "The number of applications are increasing each day than before."], answer: 1, solution: "Correct Option: B.\nReason: 'The number of' takes a singular verb; 'a number of' takes a plural verb." },
+                    { type: "mcq", prompt: "Identify the correctly hyphenated compound:", options: ["It is a well designed interface.", "It is a well-designed interface.", "It is a welldesigned interface.", "It is well designed-interface."], answer: 1, solution: "Correct Option: B ('well-designed').\nReason: Compound adjectives before a noun are hyphenated." },
+                    { type: "mcq", prompt: "Select the correct sentence:", options: ["I look forward to hearing from you.", "I look forward to hear from you.", "I am looking forward hear from you.", "I look forward for hearing from you."], answer: 0, solution: "Correct Option: A.\nReason: 'Look forward to' is followed by a gerund ('hearing')." },
+                    { type: "mcq", prompt: "Choose the correct sentence:", options: ["Between you and I, the deadline is unrealistic.", "Between you and me, the deadline is unrealistic.", "Between yourself and I, the deadline is unrealistic.", "Between I and you, the deadline is unrealistic."], answer: 1, solution: "Correct Option: B.\nReason: After the preposition 'between', object pronouns ('me') are required." },
+                    { type: "mcq", prompt: "Identify the sentence with correct parallel structure:", options: ["The role involves coding, testing, and to document features.", "The role involves coding, testing, and documenting features.", "The role involves to code, testing, and documenting features.", "The role involves code, to test, and documentation of features."], answer: 1, solution: "Correct Option: B.\nReason: Items in a list must share the same grammatical form (all gerunds here)." },
+                    { type: "mcq", prompt: "Select the correct usage:", options: ["The team is considering to postpone the launch.", "The team is considering postponing the launch.", "The team is considering about postponing the launch.", "The team is consider postponing the launch."], answer: 1, solution: "Correct Option: B.\nReason: 'Consider' is followed by a gerund, not an infinitive, and takes no preposition." }
                 ]
             }
         ];
 
         // --- GLOBAL APP STATE ---
-        let completedSections = new Set();
+        let completedSections = new Set();   // sections that have been submitted
+        let userAnswers = {};                // { sectionId: [answer per question] } — for MCQ/listening; text answers too
+        let sectionResults = {};             // { sectionId: report object }
         let currentSectionIdx = null;
         let currentQuestionIdx = 0;
-        let globalTimerSeconds = 1800; // 30 mins
+        let sectionTimerSeconds = 1800;      // 30 mins per section
+        let sectionTimerInterval = null;
         let speechTimer = null;
-        let timerPaused = false;
+        let testSubmitted = false;           // current section submitted (locks inputs, unlocks solutions)
 
-        // --- TIMER LOGIC ---
-        function startGlobalTimer() {
+        // --- SECTION TIMER LOGIC (per-section 30 min) ---
+        function startSectionTimer() {
+            stopSectionTimer();
+            sectionTimerSeconds = 1800;
             const timerDisplay = document.getElementById('global-timer');
-            setInterval(() => {
-                if (timerPaused) return;
+            timerDisplay.style.display = '';
+            updateTimerDisplay();
 
-                if (globalTimerSeconds <= 0) {
-                    timerDisplay.textContent = "Time Elapsed: 00:00";
-                    alert("30 Minutes overall time limit expired!");
-                    returnToHome();
+            sectionTimerInterval = setInterval(() => {
+                sectionTimerSeconds--;
+                if (sectionTimerSeconds <= 0) {
+                    sectionTimerSeconds = 0;
+                    updateTimerDisplay();
+                    autoSubmitOnExpiry();
                     return;
                 }
-                globalTimerSeconds--;
-                const mins = Math.floor(globalTimerSeconds / 60);
-                const secs = globalTimerSeconds % 60;
-                timerDisplay.textContent = `Time Left: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                updateTimerDisplay();
             }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerDisplay = document.getElementById('global-timer');
+            const mins = Math.floor(sectionTimerSeconds / 60);
+            const secs = sectionTimerSeconds % 60;
+            timerDisplay.textContent = `Time Left: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function stopSectionTimer() {
+            if (sectionTimerInterval) {
+                clearInterval(sectionTimerInterval);
+                sectionTimerInterval = null;
+            }
+        }
+
+        function autoSubmitOnExpiry() {
+            stopSectionTimer();
+            submitSection(true);
         }
 
         // --- RENDER HOMEPAGE ---
         function renderHome() {
-            timerPaused = false; // Resume timer when returning home
+            stopSectionTimer();
+            document.getElementById('global-timer').style.display = 'none';
+            document.getElementById('back-home-btn').style.display = 'none';
             const grid = document.getElementById('sections-grid');
             grid.innerHTML = '';
 
@@ -557,7 +630,8 @@
                         <button class="btn-primary" onclick="startSection(${idx})">
                             ${isDone ? 'Retake Section' : 'Start Section'}
                         </button>
-                        <button class="btn-secondary" onclick="viewSectionSolutions(${idx})">
+                        <button class="btn-secondary" onclick="viewSectionSolutions(${idx})"
+                            ${isDone ? '' : 'disabled title="Complete the test to view solutions" style="opacity:0.5; cursor:not-allowed;"'}>
                             View Solutions
                         </button>
                     </div>
@@ -570,13 +644,26 @@
         function startSection(idx) {
             currentSectionIdx = idx;
             currentQuestionIdx = 0;
-            
+            testSubmitted = false;
+            userAnswers[assessmentData[idx].id] = new Array(assessmentData[idx].questions.length).fill(null);
+
             document.getElementById('home-view').classList.remove('active');
             document.getElementById('solutions-view').classList.remove('active');
             document.getElementById('assessment-view').classList.add('active');
-            
+            document.getElementById('back-home-btn').style.display = '';
+
             document.getElementById('section-title').textContent = assessmentData[idx].title;
+            startSectionTimer();
             renderQuestion();
+        }
+
+        // --- BACK TO HOME (with confirmation mid-test) ---
+        function handleBackToHome() {
+            if (!testSubmitted) {
+                const leave = confirm("Leave the test? Your progress in this section will be lost and the timer reset.");
+                if (!leave) return;
+            }
+            returnToHome();
         }
 
         function renderQuestion() {
@@ -590,11 +677,18 @@
 
             if (speechTimer) clearInterval(speechTimer);
 
+            if (testSubmitted) {
+                body.innerHTML = `<div class="timer-expired">This test has been submitted. View the report in View Solutions from the home page.</div>`;
+                document.getElementById('next-btn').style.display = 'none';
+                return;
+            }
+            document.getElementById('next-btn').style.display = '';
+
             // Render type-specific layout
             if (q.type === 'writing') {
                 body.innerHTML = `
                     <div class="prompt-box">${q.prompt}</div>
-                    <textarea id="writing-input" placeholder="Type your professional response here..." oninput="updateWordCount(this)"></textarea>
+                    <textarea id="writing-input" placeholder="Type your professional response here..." oninput="updateWordCount(this); saveAnswer(this.value)"></textarea>
                     <div class="word-count">Words: <span id="word-cnt">0</span></div>
                 `;
             } else if (q.type === 'mcq') {
@@ -606,7 +700,7 @@
                     html += `
                         <div class="option-item">
                             <label class="option-label">
-                                <input type="radio" name="option" value="${oIdx}">
+                                <input type="radio" name="option" value="${oIdx}" onchange="saveAnswer(${oIdx})" ${getUserAnswer() === oIdx ? 'checked' : ''}>
                                 ${opt}
                             </label>
                         </div>
@@ -614,6 +708,7 @@
                 });
                 html += '</div>';
                 body.innerHTML = html;
+                if (getUserAnswer() !== null) saveAnswer(getUserAnswer());
             } else if (q.type === 'listening') {
                 body.innerHTML = `
                     <div class="prompt-box" style="display:flex; align-items:center; gap: 1rem;">
@@ -625,7 +720,7 @@
                         ${q.options.map((opt, oIdx) => `
                             <div class="option-item">
                                 <label class="option-label">
-                                    <input type="radio" name="option" value="${oIdx}">
+                                    <input type="radio" name="option" value="${oIdx}" onchange="saveAnswer(${oIdx})" ${getUserAnswer() === oIdx ? 'checked' : ''}>
                                     ${opt}
                                 </label>
                             </div>
@@ -637,12 +732,24 @@
                     <div class="prompt-box">${q.prompt}</div>
                     <div class="status-text" id="speak-status">Preparation Time</div>
                     <div class="speaking-timer" id="speak-timer">60</div>
+                    <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+                        <button class="btn-primary" id="mic-btn" style="max-width:260px;" onclick="toggleMic()" disabled>🎤 Microphone unlocks after prep time</button>
+                    </div>
+                    <textarea id="transcript-input" placeholder="Your spoken response will appear here once speech recognition completes. You can also type or edit your answer here." oninput="saveAnswer(this.value)" style="height:160px;"></textarea>
+                    <div class="word-count">Words: <span id="word-cnt">0</span></div>
                 `;
                 runSpokenTimers();
             }
 
+            // Speech-to-text for spoken questions
+            if (q.type === 'spoken') {
+                setupSpeechRecognition();
+            }
+
             // Adjust Next Button text for last question
             const nextBtn = document.getElementById('next-btn');
+            const backBtn = document.getElementById('back-btn');
+            backBtn.style.display = currentQuestionIdx > 0 ? '' : 'none';
             if (currentQuestionIdx === section.questions.length - 1) {
                 nextBtn.textContent = "Finish Section";
             } else {
@@ -650,9 +757,27 @@
             }
         }
 
+        function prevQuestion() {
+            if (currentQuestionIdx > 0) {
+                currentQuestionIdx--;
+                renderQuestion();
+            }
+        }
+
         function updateWordCount(ta) {
             const words = ta.value.trim().split(/\s+/).filter(w => w.length > 0);
             document.getElementById('word-cnt').textContent = words.length;
+        }
+
+        // --- ANSWER STATE HELPERS ---
+        function saveAnswer(value) {
+            const section = assessmentData[currentSectionIdx];
+            userAnswers[section.id][currentQuestionIdx] = value;
+        }
+
+        function getUserAnswer() {
+            const section = assessmentData[currentSectionIdx];
+            return userAnswers[section.id] ? userAnswers[section.id][currentQuestionIdx] : null;
         }
 
         function playAudio(text) {
@@ -666,27 +791,120 @@
             }
         }
 
+        // --- SPEECH-TO-TEXT (Web Speech API) for Spoken Topics ---
+        let recognition = null;
+        let recognizing = false;
+        let finalTranscript = '';
+
+        function toggleMic() {
+            if (recognizing) {
+                recognition.stop();
+            } else {
+                startRecognition();
+            }
+        }
+
+        function startRecognition() {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) return;
+            recognition = new SR();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            finalTranscript = getUserAnswer() && typeof getUserAnswer() === 'string' ? getUserAnswer() : '';
+            const ta = document.getElementById('transcript-input');
+            if (ta && finalTranscript) ta.value = finalTranscript;
+
+            recognition.onresult = (event) => {
+                let interim = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript + ' ';
+                    } else {
+                        interim += event.results[i][0].transcript;
+                    }
+                }
+                const ta = document.getElementById('transcript-input');
+                if (ta) {
+                    ta.value = (finalTranscript + interim).trim();
+                    ta.dispatchEvent(new Event('input'));
+                }
+            };
+            recognition.onend = () => {
+                recognizing = false;
+                const micBtn = document.getElementById('mic-btn');
+                if (micBtn && !testSubmitted) {
+                    micBtn.textContent = '🎤 Start Recording';
+                    micBtn.style.backgroundColor = 'var(--primary)';
+                }
+            };
+            recognition.onerror = (event) => {
+                recognizing = false;
+                const micBtn = document.getElementById('mic-btn');
+                if (micBtn) { micBtn.textContent = '🎤 Start Recording'; micBtn.style.backgroundColor = 'var(--primary)'; }
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    alert('Microphone permission denied. Please type your answer in the text box instead.');
+                } else if (event.error === 'no-speech') {
+                    alert('No speech was detected. Please try again or type your answer.');
+                }
+            };
+
+            finalTranscript = '';
+            recognizing = true;
+            const micBtn = document.getElementById('mic-btn');
+            micBtn.textContent = '⏹ Stop Recording (listening…)';
+            micBtn.style.backgroundColor = 'var(--danger)';
+            recognition.start();
+        }
+
+        function stopMicIfActive() {
+            if (recognition && recognizing) {
+                recognition.stop();
+                recognizing = false;
+            }
+        }
+
         function runSpokenTimers() {
             let prepLeft = 60;
             let speakLeft = 90;
             const timerEl = document.getElementById('speak-timer');
             const statusEl = document.getElementById('speak-status');
+            const micBtn = document.getElementById('mic-btn');
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SR) {
+                micBtn.style.display = 'none';
+                const note = document.createElement('p');
+                note.style.cssText = 'text-align:center; color:var(--text-muted); margin-bottom:1rem;';
+                note.textContent = 'Speech recognition is not supported in this browser — please type your answer below.';
+                micBtn.parentElement.appendChild(note);
+            }
 
             speechTimer = setInterval(() => {
                 if (prepLeft > 0) {
                     prepLeft--;
                     timerEl.textContent = prepLeft;
+                    if (prepLeft === 0 && SR) {
+                        micBtn.disabled = false;
+                        micBtn.textContent = '🎤 Start Recording';
+                    } else if (prepLeft === 0) {
+                        micBtn.textContent = 'Speak now (type below if mic unavailable)';
+                    }
                 } else if (speakLeft > 0) {
                     if (speakLeft === 90) {
-                        statusEl.textContent = "Microphone Active - Speak Now";
-                        statusEl.style.color = "var(--danger)";
+                        statusEl.textContent = SR ? 'Microphone Active — Speak Now (you may keep typing too)' : 'Speaking Time — type your answer below';
+                        statusEl.style.color = 'var(--danger)';
                     }
                     speakLeft--;
                     timerEl.textContent = speakLeft;
-                } else {
-                    clearInterval(speechTimer);
-                    statusEl.textContent = "Speaking Time Complete";
-                    statusEl.style.color = "var(--success)";
+                    if (speakLeft === 0) {
+                        clearInterval(speechTimer);
+                        speechTimer = null;
+                        stopMicIfActive();
+                        statusEl.textContent = 'Speaking Time Complete — you can still edit your answer below';
+                        statusEl.style.color = 'var(--success)';
+                    }
                 }
             }, 1000);
         }
@@ -698,70 +916,200 @@
                 renderQuestion();
             } else {
                 // Submit Section
-                completedSections.add(section.id);
-                returnToHome();
+                submitSection(false);
             }
         }
 
-        // --- VIEW SOLUTIONS PAGE (ACCESSIBLE FROM HOME) ---
-        function viewSectionSolutions(idx) {
-            timerPaused = true; // Pause assessment timer while reviewing solutions
+        // --- SUBMIT SECTION ---
+        function submitSection(expired) {
+            stopSectionTimer();
+            if (speechTimer) clearInterval(speechTimer);
+            stopMicIfActive();
+            const section = assessmentData[currentSectionIdx];
+
+            // Final capture of whatever is on screen
+            const ta = document.getElementById('writing-input') || document.getElementById('transcript-input');
+            if (ta) saveAnswer(ta.value);
+            const checkedRadio = document.querySelector('input[name="option"]:checked');
+            if (checkedRadio) saveAnswer(parseInt(checkedRadio.value));
+
+            testSubmitted = true;
+            completedSections.add(section.id);
+
+            // Deterministic scoring for pure-MCQ sections happens now;
+            // unstructured sections are evaluated later in View Solutions (LLM).
+            buildDeterministicReport(section.id);
+
+            if (expired) {
+                alert("Time's up! 30 minutes expired — the test was auto-submitted with what you completed. View your report in View Solutions.");
+            }
+            returnToHome();
+        }
+
+        // --- DETERMINISTIC MCQ SCORING (Reading Paragraph, Grammar; also Listening) ---
+        function buildDeterministicReport(sectionId) {
+            const section = assessmentData.find(s => s.id === sectionId);
+            if (!section) return;
+            const isMcq = section.questions.every(q => q.type === 'mcq' || q.type === 'listening');
+            if (!isMcq) return; // unstructured sections get the LLM report in View Solutions
+
+            const answers = userAnswers[sectionId] || [];
+            let correct = 0;
+            const perQuestion = section.questions.map((q, i) => {
+                const ua = answers[i];
+                const ok = ua !== null && ua !== undefined && ua !== '' && Number(ua) === q.answer;
+                if (ok) correct++;
+                return { index: i, userAnswer: ua, correctAnswer: q.answer, isCorrect: ok };
+            });
+            sectionResults[sectionId] = {
+                type: 'deterministic',
+                score: correct,
+                total: section.questions.length,
+                perQuestion
+            };
+        }
+
+        // --- VIEW SOLUTIONS PAGE (locked until section completed) ---
+        function viewSectionSolutions(idx, force) {
             const section = assessmentData[idx];
+            if (!completedSections.has(section.id) && !force) {
+                alert("Complete the test first — solutions unlock once the section is submitted.");
+                return;
+            }
             
             document.getElementById('home-view').classList.remove('active');
             document.getElementById('assessment-view').classList.remove('active');
             document.getElementById('solutions-view').classList.add('active');
 
-            document.getElementById('solution-section-title').textContent = `${section.title} - Solution Key`;
-            
+            document.getElementById('solution-section-title').textContent = `${section.title} — Your Report`;
+
             const container = document.getElementById('solutions-body');
             container.innerHTML = '';
+
+            const result = sectionResults[section.id];
+            const answers = userAnswers[section.id] || [];
+
+            // Overall report banner
+            if (result && result.type === 'deterministic') {
+                const pct = Math.round((result.score / result.total) * 100);
+                container.innerHTML += `
+                    <div class="solution-card" style="border-left:5px solid var(--primary);">
+                        <h3>Overall Score: ${result.score} / ${result.total} (${pct}%)</h3>
+                    </div>
+                `;
+            } else {
+                container.innerHTML += `
+                    <div class="solution-card" style="border-left:5px solid var(--warning);">
+                        <h3>Evaluating written/spoken answers…</h3>
+                        <p style="color:var(--text-muted);">AI evaluation runs below per question. Unanswered items are marked as skipped.</p>
+                    </div>
+                `;
+            }
 
             section.questions.forEach((q, qIdx) => {
                 const card = document.createElement('div');
                 card.className = 'solution-card';
 
                 let questionContent = `<p style="font-weight:700; color:var(--primary-dark); margin-bottom:0.5rem;">Q${qIdx + 1}.</p>`;
-                
+
                 if (q.passage) {
                     questionContent += `<div class="prompt-box" style="font-size:0.95rem; margin-bottom:0.75rem;">${q.passage}</div>`;
                 }
                 if (q.textToRead) {
                     questionContent += `<p style="font-style:italic; color:var(--text-muted); margin-bottom:0.5rem;">[Audio Context]: "${q.textToRead}"</p>`;
                 }
-                
+
                 questionContent += `<p style="font-weight:600; margin-bottom: 0.75rem;">${q.prompt}</p>`;
 
                 if (q.options) {
-                    questionContent += `<ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">`;
+                    const ua = answers[qIdx];
+                    const res = result && result.perQuestion ? result.perQuestion.find(p => p.index === qIdx) : null;
+                    questionContent += `<ul style="margin-left: 1.5rem; margin-bottom: 1rem;">`;
                     q.options.forEach((opt, oIdx) => {
-                        questionContent += `<li>${String.fromCharCode(65 + oIdx)}. ${opt}</li>`;
+                        let style = 'color: var(--text-muted);';
+                        if (oIdx === q.answer) style = 'color:#15803d; font-weight:700;';
+                        else if (res && Number(ua) === oIdx && !res.isCorrect) style = 'color:#b91c1c; text-decoration:line-through;';
+                        questionContent += `<li style="${style}">${String.fromCharCode(65 + oIdx)}. ${opt}${oIdx === q.answer ? ' ✓ (correct)' : ''}${res && Number(ua) === oIdx && !res.isCorrect ? ' ✗ (your answer)' : ''}</li>`;
                     });
                     questionContent += `</ul>`;
+                    if (res) {
+                        questionContent += `<div class="solution-box" style="${res.isCorrect ? '' : 'background-color:#fef2f2; border-color:#fecaca; color:#b91c1c;'}">
+                            <strong>${res.isCorrect ? '✓ Correct' : '✗ Incorrect'}:</strong> ${q.solution}
+                        </div>`;
+                    }
+                } else {
+                    // Unstructured (writing / spoken) — user answer vs model answer + AI evaluation slot
+                    const ua = answers[qIdx];
+                    const hasAnswer = ua && String(ua).trim().length > 0;
+                    questionContent += `
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Your Answer:</strong>
+                            <div class="solution-box" style="background-color:#eff6ff; border-color:#bfdbfe; color:#1e3a8a;">${hasAnswer ? String(ua).replace(/</g, '&lt;') : '<em>Skipped — no answer submitted.</em>'}</div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Reference / Model Answer:</strong>
+                            <div class="solution-box">${q.solution}</div>
+                        </div>
+                        <div id="ai-eval-${qIdx}">${hasAnswer ? '<em style="color:var(--text-muted);">AI evaluation pending…</em>' : '<em style="color:var(--text-muted);">Skipped — nothing to evaluate.</em>'}</div>
+                    `;
                 }
-
-                questionContent += `
-                    <div class="solution-box">
-                        <strong>Reference Solution / Explanation:</strong>\n${q.solution}
-                    </div>
-                `;
 
                 card.innerHTML = questionContent;
                 container.appendChild(card);
+
+                // Fire LLM evaluation for unstructured answers
+                if (!q.options && section.id !== 'reading' && section.id !== 'grammar') {
+                    const ua = answers[qIdx];
+                    if (ua && String(ua).trim().length > 0) {
+                        requestLlmEvaluation(section.id, qIdx, q, ua);
+                    }
+                }
             });
+        }
+
+        // --- LLM EVALUATION (unstructured answers only) ---
+        async function requestLlmEvaluation(sectionId, qIdx, question, userAnswer) {
+            const slot = document.getElementById(`ai-eval-${qIdx}`);
+            try {
+                const resp = await fetch('api/evaluate.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: question.prompt,
+                        model_answer: question.solution,
+                        user_answer: userAnswer
+                    })
+                });
+                if (!resp.ok) throw new Error('Evaluation service returned ' + resp.status);
+                const data = await resp.json();
+                slot.innerHTML = `
+                    <div class="solution-box" style="background-color:#faf5ff; border-color:#e9d5ff; color:#5b21b6;">
+                        <strong>AI Evaluation — Score: ${data.score}/10</strong>\n
+                        <p style="margin-top:0.5rem;"><strong>Strengths:</strong> ${data.strengths || '—'}</p>
+                        <p><strong>Improvements:</strong> ${data.improvements || '—'}</p>
+                        <p style="margin-top:0.5rem;"><strong>Suggested revised answer:</strong></p>
+                        <div style="white-space:pre-wrap; margin-top:0.25rem;">${data.revised_answer || '—'}</div>
+                    </div>
+                `;
+            } catch (err) {
+                slot.innerHTML = `<div class="solution-box" style="background-color:#fef2f2; border-color:#fecaca; color:#b91c1c;">AI evaluation unavailable for this answer (${err.message}). Compare with the model answer above.</div>`;
+            }
         }
 
         function returnToHome() {
             if (speechTimer) clearInterval(speechTimer);
+            stopMicIfActive();
+            stopSectionTimer();
             document.getElementById('assessment-view').classList.remove('active');
             document.getElementById('solutions-view').classList.remove('active');
             document.getElementById('home-view').classList.add('active');
+            document.getElementById('back-home-btn').style.display = 'none';
+            document.getElementById('global-timer').style.display = 'none';
             renderHome();
         }
 
         // Initialize App
         window.onload = () => {
-            startGlobalTimer();
             renderHome();
         };
     </script>
